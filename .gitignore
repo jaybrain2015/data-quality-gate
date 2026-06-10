@@ -1,20 +1,30 @@
 # Terraform
-.terraform/          # downloaded provider plugins — large and machine-specific
-*.tfstate            # state file: records every resource, can contain secrets in plaintext
-*.tfstate.backup     # Terraform's auto-backup of the above
-crash.log            # Terraform crash dumps
+# downloaded provider plugins — large and machine-specific
+.terraform/
+# state file: records every resource, can contain secrets in plaintext
+*.tfstate
+# Terraform's auto-backup of the above
+*.tfstate.backup
+# Terraform crash dumps
+crash.log
 
 # Python
-__pycache__/         # compiled bytecode caches
+# compiled bytecode caches
+__pycache__/
 *.pyc
-.pytest_cache/       # pytest's cache
-.venv/               # local virtual environment — never ship this
+# pytest's cache
+.pytest_cache/
+# local virtual environment — never ship this
+.venv/
 
 # Build artifacts
-build/               # where deploy.sh assembles the Lambda zip — regenerated every deploy
+# where deploy.sh assembles the Lambda zip — regenerated every deploy
+build/
 *.zip
 
 # Secrets / local config
-*.tfvars             # often holds account IDs, the Slack webhook, etc. — keep out of Git
-.env                 # local environment variables
-*.pem                # private keys — must NEVER be committed
+# often holds account IDs, the Slack webhook, etc. — keep out of Git
+*.tfvars
+.env
+# private keys — must NEVER be committed
+*.pem
