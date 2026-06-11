@@ -49,7 +49,7 @@ resource "aws_lambda_function" "gate" {
   handler          = "handler.handler"
   runtime          = "python3.12"
   filename         = "${path.module}/../build/function.zip"
-  source_code_hash = filebase64sha256("${path.module}/../build/function.zip")
+  source_code_hash = fileexists("${path.module}/../build/function.zip") ? filebase64sha256("${path.module}/../build/function.zip") : null
   timeout          = 30
   memory_size      = 256
 
