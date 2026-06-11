@@ -1,0 +1,14 @@
+# Drives which checks run and their thresholds.
+# Editing this file -- not the Python -- is how you tune the gate.
+checks:
+  row_count:
+    min_rows: 10
+  required_columns:
+    - id
+    - amount
+    - currency
+  null_fraction:
+    amount:
+      max: 0.0      
+    currency:
+      max: 0.05    
