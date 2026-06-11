@@ -1,0 +1,75 @@
+name: CI
+
+# When does this pipeline run?
+on:
+  pull_request:        # on every PR (the gatekeeper)
+  push:
+    branches: [main]   # and on direct pushes to main
+
+jobs:
+  test:
+    name: Python tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install pytest pyyaml boto3
+
+      - name: Run tests
+        run: python -m pytest -q
+
+  terraform:
+    name: Terraform validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v4
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Check formatting
+        run: terraform -chdir=terraform fmt -check
+
+      - name: Initialize (no backend needed for validation)
+        run: terraform -chdir=terraform init -backend=false
+
+      - name: Validate configuration
+        run: terraform -chdir=terraform validate
+
+# ---------------------------------------------------------------------------
+# DEPLOY JOB (documented, intentionally disabled).
+#
+# This is how auto-deploy on merge to main would work, authenticating to AWS
+# via OIDC -- short-lived credentials requested at deploy time, so NO static
+# AWS keys are ever stored in GitHub. To enable it:
+#   1. Create an IAM OIDC identity provider for token.actions.githubusercontent.com
+#   2. Create an IAM role whose trust policy allows this repo to assume it
+#   3. Add the role ARN as a repository variable named AWS_DEPLOY_ROLE_ARN
+#   4. Uncomment the job below.
+#
+#  deploy:
+#    name: Deploy to AWS
+#    needs: [test, terraform]            # only deploy if tests + validate passed
+#    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+#    runs-on: ubuntu-latest
+#    permissions:
+#      id-token: write                   # required for OIDC
+#      contents: read
+#    steps:
+#      - uses: actions/checkout@v4
+#      - name: Configure AWS credentials via OIDC
+#        uses: aws-actions/configure-aws-credentials@v4
+#        with:
+#          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+#          aws-region: eu-north-1
+#      - name: Deploy
+#        run: bash scripts/deploy.sh
+# ---------------------------------------------------------------------------
